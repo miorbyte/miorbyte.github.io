@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inovasi Cikgu Mior</title>
+<meta name="description" content="Koleksi inovasi digital dan pendidikan oleh Cikgu Mior — Kolej Vokasional Kulim.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f1a;
+    --panel:#121a2c;
+    --panel-alt:#182238;
+    --line: rgba(232,179,71,0.16);
+    --gold:#e8b347;
+    --cyan:#49d6c6;
+    --text:#f3f1e7;
+    --muted:#8b93a8;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 12% -8%, rgba(232,179,71,0.10), transparent 42%),
+      radial-gradient(circle at 88% 4%, rgba(73,214,198,0.10), transparent 42%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+
+  /* ---- background circuit lines (signature element) ---- */
+  .circuit-bg{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity:0.35;
+    pointer-events:none;
+    background-image:
+      linear-gradient(rgba(232,179,71,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,179,71,0.05) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image: radial-gradient(circle at 50% 0%, black, transparent 70%);
+  }
+
+  header{
+    position:relative;
+    z-index:1;
+    max-width:1180px;
+    margin:0 auto;
+    padding:64px 28px 40px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+    color:var(--cyan);
+    text-transform:uppercase;
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:7px;height:7px;border-radius:50%;
+    background:var(--cyan);
+    box-shadow:0 0 10px var(--cyan);
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(38px,6.5vw,68px);
+    line-height:1.02;
+    letter-spacing:-0.02em;
+    margin:0 0 18px;
+    background:linear-gradient(120deg,#fdfbf4 20%, var(--gold) 65%, var(--cyan) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .lede{
+    max-width:560px;
+    color:var(--muted);
+    font-size:16px;
+    line-height:1.65;
+  }
+  .lede b{color:var(--text);font-weight:600;}
+  .stat-row{
+    display:flex;
+    gap:36px;
+    margin-top:38px;
+    flex-wrap:wrap;
+  }
+  .stat{
+    font-family:'JetBrains Mono',monospace;
+  }
+  .stat .n{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:28px;
+    color:var(--gold);
+    font-weight:600;
+  }
+  .stat .l{
+    font-size:11.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .hairline{
+    height:1px;
+    background:linear-gradient(90deg, var(--gold) 0%, rgba(232,179,71,0.05) 100%);
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  main{
+    position:relative;
+    z-index:1;
+    max-width:1180px;
+    margin:0 auto;
+    padding:48px 28px 100px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(310px, 1fr));
+    gap:26px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(232,179,71,0.5);
+    box-shadow:0 16px 40px rgba(0,0,0,0.35);
+  }
+  .card-media{
+    position:relative;
+    aspect-ratio:16/10;
+    background:var(--panel-alt);
+    overflow:hidden;
+  }
+  .card-media img{
+    width:100%;height:100%;object-fit:cover;
+    display:block;
+    filter:saturate(1.02);
+    transition:transform .4s ease;
+  }
+  .card:hover .card-media img{transform:scale(1.04);}
+  .hex-tag{
+    position:absolute;
+    top:12px;left:12px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    background:rgba(11,15,26,0.75);
+    backdrop-filter:blur(4px);
+    color:var(--gold);
+    padding:4px 9px;
+    border-radius:6px;
+    border:1px solid rgba(232,179,71,0.3);
+    letter-spacing:.05em;
+  }
+  .card-body{
+    padding:20px 22px 22px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+  }
+  .card-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:19px;
+    font-weight:600;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .card-desc{
+    color:var(--muted);
+    font-size:13.8px;
+    line-height:1.6;
+    margin:0 0 18px;
+    flex:1;
+    display:-webkit-box;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .card-link{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--cyan);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    width:fit-content;
+    padding-top:4px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    width:100%;
+    justify-content:space-between;
+  }
+  .card-link:hover{color:var(--gold);}
+  .card-link .arrow{transition:transform .18s;}
+  .card-link:hover .arrow{transform:translateX(3px);}
+
+  .state{
+    text-align:center;
+    padding:80px 20px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:13.5px;
+    grid-column:1/-1;
+  }
+  .state .big{
+    font-family:'Space Grotesk',sans-serif;
+    color:var(--text);
+    font-size:19px;
+    margin-bottom:8px;
+    display:block;
+  }
+  .skeleton{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .skeleton .card-media{background:linear-gradient(100deg, var(--panel-alt) 30%, #223050 50%, var(--panel-alt) 70%); background-size:200% 100%; animation:shine 1.4s infinite;}
+  @keyframes shine{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .skeleton .line{height:11px;background:var(--panel-alt);border-radius:4px;margin:14px 22px;}
+  .skeleton .line.w60{width:60%;}
+  .skeleton .line.w90{width:90%;}
+
+  footer{
+    position:relative;z-index:1;
+    text-align:center;
+    padding:36px 20px 50px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+  footer a{color:var(--gold);text-decoration:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    * { animation:none !important; transition:none !important; }
+  }
+
+  /* ---- Admin button ---- */
+  .admin-btn{
+    position:fixed;
+    top:22px;right:22px;
+    z-index:5;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    background:rgba(18,26,44,0.7);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.05em;
+    padding:8px 14px;
+    border-radius:100px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .admin-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .admin-btn svg{width:12px;height:12px;flex-shrink:0;}
+
+  /* ---- Modal ---- */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:20;
+    background:rgba(6,8,14,0.72);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px 26px;
+    max-width:340px;
+    width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,0.5);
+    animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:scale(0.96);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal-box.shake{animation:shake .32s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+  .modal-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;color:var(--cyan);
+    letter-spacing:.1em;text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .modal-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:19px;font-weight:600;
+    margin:0 0 18px;
+  }
+  .modal-box input[type=password]{
+    width:100%;
+    background:var(--panel-alt);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:9px;
+    padding:11px 13px;
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:14.5px;
+    letter-spacing:.1em;
+    outline:none;
+    margin-bottom:10px;
+  }
+  .modal-box input[type=password]:focus{border-color:var(--gold);}
+  .modal-err{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;color:#e8664f;
+    min-height:16px;
+    margin-bottom:10px;
+  }
+  .modal-actions{display:flex;gap:10px;}
+  .modal-actions button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;font-size:13.5px;
+    border-radius:9px;border:none;
+    padding:10px 18px;cursor:pointer;
+  }
+  .modal-submit{background:var(--gold);color:#1a1200;}
+  .modal-cancel{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.12) !important;}
+
+  /* ---- Visitor counter ---- */
+  .counter-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    padding:10px 0 8px;
+  }
+  .counter-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--muted);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  .counter-digits{
+    display:flex;
+    gap:5px;
+  }
+  .counter-digits span{
+    font-family:'JetBrains Mono',monospace;
+    font-size:17px;
+    font-weight:500;
+    color:var(--gold);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    width:26px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+</style>
+</head>
+<body>
+<div class="circuit-bg"></div>
+
+<button class="admin-btn" onclick="bukaModalAdmin()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+  Admin
+</button>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-eyebrow">// akses terhad</div>
+    <div class="modal-title">Log Masuk Admin</div>
+    <input type="password" id="modalPass" placeholder="Kata laluan" autocomplete="off">
+    <div class="modal-err" id="modalErr"></div>
+    <div class="modal-actions">
+      <button class="modal-submit" onclick="semakPassword()">Masuk</button>
+      <button class="modal-cancel" onclick="tutupModalAdmin()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="eyebrow">KV Kulim · miorbyte.github.io</div>
+  <h1>Inovasi Cikgu Mior</h1>
+  <p class="lede">Koleksi projek dan sistem digital yang direka untuk menyelesaikan masalah sebenar di sekolah — dari pemantauan RPH sehingga platform pembelajaran. <b>Setiap inovasi dibina, diuji dan digunakan.</b></p>
+  <div class="stat-row">
+    <div class="stat"><div class="n" id="statCount">—</div><div class="l">Inovasi</div></div>
+    <div class="stat"><div class="n">GAS</div><div class="l">Google Apps Script</div></div>
+    <div class="stat"><div class="n">KVK</div><div class="l">Kolej Vokasional Kulim</div></div>
+  </div>
+</header>
+
+<div class="hairline"></div>
+
+<main>
+  <div class="grid" id="grid">
+    <div class="skeleton"><div class="card-media"></div><div class="line w60"></div><div class="line w90"></div><div class="line w60"></div></div>
+    <div class="skeleton"><div class="card-media"></div><div class="line w60"></div><div class="line w90"></div><div class="line w60"></div></div>
+    <div class="skeleton"><div class="card-media"></div><div class="line w60"></div><div class="line w90"></div><div class="line w60"></div></div>
+  </div>
+</main>
+
+<footer>
+  <div class="counter-wrap">
+    <div class="counter-label">Jumlah Pelawat</div>
+    <div class="counter-digits" id="counterDigits">
+      <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span>
+    </div>
+  </div>
+  Dibina oleh Cikgu Mior — dikuasakan Google Apps Script &amp; GitHub Pages
+</footer>
+
+<script>
+/* ====== TETAPKAN URL APPS SCRIPT WEB APP ANDA DI SINI ====== */
+const APPS_SCRIPT_URL = "https://script.google.com/a/macros/moe-dl.edu.my/s/AKfycbxTRFqAH36FPrniXuTyVkPBD_OeGmqSGo3Rb2JrLrhEToBml6ikRDJiY9aQSUlUNFYLEg/exec";
+/* ============================================================ */
+
+function thumbnailFor(link){
+  // Auto-jana imej screenshot dari link menggunakan thum.io (percuma, tiada API key)
+  return `https://image.thum.io/get/width/700/crop/440/noanimate/${link}`;
+}
+
+function toHex(n){
+  return '0x' + n.toString(16).padStart(2,'0').toUpperCase();
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.innerText = str || '';
+  return d.innerHTML;
+}
+
+function renderCards(items){
+  const grid = document.getElementById('grid');
+  document.getElementById('statCount').innerText = items.length;
+
+  if(!items.length){
+    grid.innerHTML = `
+      <div class="state">
+        <span class="big">Belum ada inovasi disenaraikan</span>
+        Sila tambah melalui panel admin.
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map((it, idx) => `
+    <div class="card">
+      <div class="card-media">
+        <span class="hex-tag">${toHex(items.length - idx)}</span>
+        <img src="${thumbnailFor(it.link)}" alt="${escapeHtml(it.nama)}" loading="lazy"
+             onerror="this.style.display='none'">
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">${escapeHtml(it.nama)}</h3>
+        <p class="card-desc">${escapeHtml(it.keterangan)}</p>
+        <a class="card-link" href="${it.link}" target="_blank" rel="noopener">
+          <span>Lihat Inovasi</span><span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderError(){
+  document.getElementById('grid').innerHTML = `
+    <div class="state">
+      <span class="big">Tidak dapat memuatkan data</span>
+      Sila semak sambungan internet, atau URL Apps Script di dalam index.html.
+    </div>`;
+}
+
+fetch(`${APPS_SCRIPT_URL}?action=list`)
+  .then(res => res.json())
+  .then(json => {
+    if(json.success){
+      renderCards(json.data);
+    } else {
+      renderError();
+    }
+  })
+  .catch(renderError);
+
+/* ====== Counter Pelawat (5-digit) ====== */
+fetch(`${APPS_SCRIPT_URL}?action=count`)
+  .then(res => res.json())
+  .then(json => {
+    if(json.success) renderCounter(json.count);
+  })
+  .catch(() => {}); // senyap sahaja jika gagal, tak kritikal
+
+function renderCounter(n){
+  const digits = String(n).padStart(5, '0').slice(-5).split('');
+  const boxes = document.querySelectorAll('#counterDigits span');
+  digits.forEach((d, i) => { if(boxes[i]) boxes[i].innerText = d; });
+}
+
+/* ====== Admin Login Modal ====== */
+const ADMIN_PASSWORD = "Admin@3974";
+
+function bukaModalAdmin(){
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalPass').value = '';
+  document.getElementById('modalErr').innerText = '';
+  setTimeout(() => document.getElementById('modalPass').focus(), 50);
+}
+
+function tutupModalAdmin(){
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function semakPassword(){
+  const val = document.getElementById('modalPass').value;
+  if(val === ADMIN_PASSWORD){
+    window.location.href = APPS_SCRIPT_URL;
+  } else {
+    const box = document.getElementById('modalBox');
+    document.getElementById('modalErr').innerText = 'Kata laluan salah. Cuba lagi.';
+    box.classList.remove('shake');
+    void box.offsetWidth; // reset animasi
+    box.classList.add('shake');
+  }
+}
+
+document.getElementById('modalPass').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') semakPassword();
+});
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'modalOverlay') tutupModalAdmin();
+});
+</script>
+</body>
+</html>
