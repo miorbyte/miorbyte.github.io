@@ -32,7 +32,6 @@
     min-height:100vh;
   }
 
-  /* ---- background circuit lines (signature element) ---- */
   .circuit-bg{
     position:fixed;
     inset:0;
@@ -155,9 +154,20 @@
     transition:transform .4s ease;
   }
   .card:hover .card-media img{transform:scale(1.04);}
+  .no-img{
+    position:absolute;inset:0;
+    display:none;
+    align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.08em;
+  }
+  .card-media.no-image .no-img{display:flex;}
   .hex-tag{
     position:absolute;
     top:12px;left:12px;
+    z-index:2;
     font-family:'JetBrains Mono',monospace;
     font-size:11px;
     background:rgba(11,15,26,0.75);
@@ -200,7 +210,6 @@
     display:inline-flex;
     align-items:center;
     gap:6px;
-    width:fit-content;
     padding-top:4px;
     border-top:1px solid rgba(255,255,255,0.06);
     width:100%;
@@ -435,19 +444,45 @@
 const APPS_SCRIPT_URL = "https://script.google.com/a/macros/moe-dl.edu.my/s/AKfycbxTRFqAH36FPrniXuTyVkPBD_OeGmqSGo3Rb2JrLrhEToBml6ikRDJiY9aQSUlUNFYLEg/exec";
 /* ============================================================ */
 
-function thumbnailFor(link){
-  // Auto-jana imej screenshot dari link menggunakan thum.io (percuma, tiada API key)
-  return `https://image.thum.io/get/width/700/crop/440/noanimate/${link}`;
+/* ====== GAMBAR INOVASI ======
+   1) Guna gambar yang diupload melalui Admin (lajur "Gambar" di Google Sheet)
+   2) Jika tiada / gagal dimuat, cuba screenshot automatik (WordPress mshots)
+   3) Jika masih gagal, papar kotak kosong "tiada gambar"
+*/
+function screenshotFallback(link){
+  return 'https://s.wordpress.com/mshots/v1/' + encodeURIComponent(link) + '?w=700&h=440';
+}
+
+function imageFor(it){
+  return it.gambar ? it.gambar : screenshotFallback(it.link);
+}
+
+function imgFailed(img){
+  if(!img.dataset.tried && img.dataset.fallback && img.src !== img.dataset.fallback){
+    img.dataset.tried = '1';
+    img.src = img.dataset.fallback;
+  } else {
+    img.style.display = 'none';
+    img.parentElement.classList.add('no-image');
+  }
 }
 
 function toHex(n){
   return '0x' + n.toString(16).padStart(2,'0').toUpperCase();
 }
 
-function escapeHtml(str){
-  const d = document.createElement('div');
-  d.innerText = str || '';
-  return d.innerHTML;
+function escapeHtml(value){
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+function safeUrl(url){
+  const u = String(url || '').trim();
+  return /^https?:\/\//i.test(u) ? u : '#';
 }
 
 function renderCards(items){
@@ -467,13 +502,18 @@ function renderCards(items){
     <div class="card">
       <div class="card-media">
         <span class="hex-tag">${toHex(items.length - idx)}</span>
-        <img src="${thumbnailFor(it.link)}" alt="${escapeHtml(it.nama)}" loading="lazy"
-             onerror="this.style.display='none'">
+        <img src="${escapeHtml(imageFor(it))}"
+             data-fallback="${escapeHtml(screenshotFallback(it.link))}"
+             alt="${escapeHtml(it.nama)}"
+             loading="lazy"
+             referrerpolicy="no-referrer"
+             onerror="imgFailed(this)">
+        <div class="no-img">tiada gambar</div>
       </div>
       <div class="card-body">
         <h3 class="card-title">${escapeHtml(it.nama)}</h3>
         <p class="card-desc">${escapeHtml(it.keterangan)}</p>
-        <a class="card-link" href="${it.link}" target="_blank" rel="noopener">
+        <a class="card-link" href="${escapeHtml(safeUrl(it.link))}" target="_blank" rel="noopener">
           <span>Lihat Inovasi</span><span class="arrow">→</span>
         </a>
       </div>
