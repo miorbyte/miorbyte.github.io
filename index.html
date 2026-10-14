@@ -198,7 +198,7 @@
     margin:0 0 18px;
     flex:1;
     display:-webkit-box;
-    -webkit-line-clamp:8;
+    -webkit-line-clamp:4;
     -webkit-box-orient:vertical;
     overflow:hidden;
   }
@@ -260,6 +260,113 @@
   @media (prefers-reduced-motion: reduce){
     * { animation:none !important; transition:none !important; }
   }
+
+  /* ---- Butang More pada kad ---- */
+  .card-desc{margin-bottom:12px;}
+  .more-btn{
+    align-self:flex-start;
+    background:transparent;
+    border:1px solid rgba(232,179,71,0.35);
+    color:var(--gold);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.05em;
+    padding:6px 14px;
+    border-radius:100px;
+    cursor:pointer;
+    margin-bottom:18px;
+    transition:background .15s, border-color .15s;
+  }
+  .more-btn:hover{background:rgba(232,179,71,0.12);border-color:var(--gold);}
+
+  /* ---- Paparan detail inovasi ---- */
+  .detail-overlay{
+    position:fixed;inset:0;z-index:30;
+    background:
+      radial-gradient(circle at 12% -8%, rgba(232,179,71,0.10), transparent 42%),
+      radial-gradient(circle at 88% 4%, rgba(73,214,198,0.10), transparent 42%),
+      var(--bg);
+    overflow-y:auto;
+    display:none;
+  }
+  .detail-overlay.open{display:block;}
+  .detail-wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:28px 24px 80px;
+  }
+  .detail-back{
+    background:rgba(18,26,44,0.7);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.05em;
+    padding:8px 16px;
+    border-radius:100px;
+    cursor:pointer;
+    margin-bottom:22px;
+  }
+  .detail-back:hover{border-color:var(--gold);color:var(--gold);}
+  .detail-media{
+    position:relative;
+    aspect-ratio:16/9;
+    background:var(--panel-alt);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:26px;
+  }
+  .detail-media img{width:100%;height:100%;object-fit:cover;display:block;}
+  .detail-media.no-image .no-img{display:flex;}
+  .detail-hex{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--gold);
+    letter-spacing:.08em;
+    margin-bottom:8px;
+  }
+  .detail-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(26px,4.5vw,40px);
+    line-height:1.1;
+    letter-spacing:-0.02em;
+    margin:0 0 10px;
+  }
+  .detail-meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:22px;
+  }
+  .detail-desc{
+    color:#cfd2dc;
+    font-size:15.5px;
+    line-height:1.8;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+  }
+  .detail-actions{
+    margin-top:38px;
+    padding-top:26px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .detail-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    background:var(--gold);
+    color:#1a1200;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    text-decoration:none;
+    padding:15px 22px;
+    border-radius:12px;
+    transition:opacity .15s;
+  }
+  .detail-link:hover{opacity:.9;}
 
   /* ---- Admin button ---- */
   .admin-btn{
@@ -439,6 +546,13 @@
   Dibina oleh Cikgu Mior — dikuasakan Google Apps Script &amp; GitHub Pages
 </footer>
 
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-wrap">
+    <button class="detail-back" onclick="tutupDetail()">← Kembali</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
 <script>
 /* ====== TETAPKAN URL APPS SCRIPT WEB APP ANDA DI SINI ====== */
 const APPS_SCRIPT_URL = "https://script.google.com/a/macros/moe-dl.edu.my/s/AKfycbxTRFqAH36FPrniXuTyVkPBD_OeGmqSGo3Rb2JrLrhEToBml6ikRDJiY9aQSUlUNFYLEg/exec";
@@ -513,6 +627,7 @@ function renderCards(items){
       <div class="card-body">
         <h3 class="card-title">${escapeHtml(it.nama)}</h3>
         <p class="card-desc">${escapeHtml(it.keterangan)}</p>
+        <button class="more-btn" onclick="bukaDetail(${idx})">More →</button>
         <a class="card-link" href="${escapeHtml(safeUrl(it.link))}" target="_blank" rel="noopener">
           <span>Lihat Inovasi</span><span class="arrow">→</span>
         </a>
@@ -533,12 +648,98 @@ fetch(`${APPS_SCRIPT_URL}?action=list`)
   .then(res => res.json())
   .then(json => {
     if(json.success){
+      senaraiInovasi = json.data;
       renderCards(json.data);
+      bukaDariHash();
     } else {
       renderError();
     }
   })
   .catch(renderError);
+
+/* ====== PAPARAN DETAIL (butang More) ====== */
+let senaraiInovasi = [];
+let dibukaDariKlik = false;
+
+function formatTarikh(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('ms-MY', { day:'numeric', month:'long', year:'numeric' });
+}
+
+// Klik butang More -> tukar hash; hashchange yang akan membuka paparan
+function bukaDetail(idx){
+  const it = senaraiInovasi[idx];
+  if(!it) return;
+  dibukaDariKlik = true;
+  location.hash = '#inovasi-' + it.id;
+}
+
+function paparDetail(idx){
+  const it = senaraiInovasi[idx];
+  if(!it) return;
+
+  const tarikh = formatTarikh(it.tarikh);
+  const keterangan = (it.keterangan || '').toString().trim();
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-media">
+      <img src="${escapeHtml(imageFor(it))}"
+           data-fallback="${escapeHtml(screenshotFallback(it.link))}"
+           alt="${escapeHtml(it.nama)}"
+           referrerpolicy="no-referrer"
+           onerror="imgFailed(this)">
+      <div class="no-img">tiada gambar</div>
+    </div>
+    <div class="detail-hex">${toHex(senaraiInovasi.length - idx)}</div>
+    <h2 class="detail-title">${escapeHtml(it.nama)}</h2>
+    ${tarikh ? `<div class="detail-meta">Ditambah pada ${escapeHtml(tarikh)}</div>` : ''}
+    <div class="detail-desc">${keterangan ? escapeHtml(keterangan) : 'Tiada keterangan.'}</div>
+    <div class="detail-actions">
+      <a class="detail-link" href="${escapeHtml(safeUrl(it.link))}" target="_blank" rel="noopener">
+        <span>Lihat Inovasi</span><span>→</span>
+      </a>
+    </div>`;
+
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function paparTutup(){
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function tutupDetail(){
+  if(dibukaDariKlik){
+    history.back(); // hashchange akan menutup paparan
+  } else {
+    // dibuka terus melalui pautan (#inovasi-...), jangan keluar dari laman
+    history.replaceState(null, '', location.pathname + location.search);
+    paparTutup();
+  }
+}
+
+function bukaDariHash(){
+  const hash = location.hash;
+  const idx = senaraiInovasi.findIndex(x => '#inovasi-' + x.id === hash);
+  if(idx >= 0){
+    paparDetail(idx);
+  } else {
+    dibukaDariKlik = false;
+    paparTutup();
+  }
+}
+
+window.addEventListener('hashchange', bukaDariHash);
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('open')){
+    tutupDetail();
+  }
+});
 
 /* ====== Counter Pelawat (5-digit) ====== */
 fetch(`${APPS_SCRIPT_URL}?action=count`)
